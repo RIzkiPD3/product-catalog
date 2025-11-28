@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
+import CategoryFilter from "../components/CategoryFilter";
 
 export default function Home() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   useEffect(() => {
     const getProducts = async () => {
@@ -25,8 +27,15 @@ export default function Home() {
     getProducts();
   }, []);
 
+  // FILTERING: Search → Category
   const filteredProducts = products.filter((item) =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const categoryFiltered = filteredProducts.filter((item) =>
+    selectedCategory === "all"
+      ? true
+      : item.category.toLowerCase() === selectedCategory.toLowerCase()
   );
 
   if (loading)
@@ -45,15 +54,23 @@ export default function Home() {
     <div className="w-[90%] max-w-5xl mx-auto text-center">
       <h1 className="text-3xl font-bold mt-10">Product Catalog</h1>
 
+      {/* Search */}
       <SearchBar value={searchTerm} onChange={setSearchTerm} />
 
-      {filteredProducts.length === 0 ? (
+      {/* Category Filter */}
+      <CategoryFilter
+        value={selectedCategory}
+        onChange={setSelectedCategory}
+      />
+
+      {/* List Produk */}
+      {categoryFiltered.length === 0 ? (
         <p className="text-lg mt-5 font-medium text-gray-600">
           Produk tidak ditemukan.
         </p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-          {filteredProducts.map((item) => (
+          {categoryFiltered.map((item) => (
             <div
               key={item.id}
               className="bg-white rounded-xl shadow-md p-4 hover:scale-105 transition cursor-pointer border"
@@ -64,7 +81,7 @@ export default function Home() {
                 className="w-full h-40 object-contain"
               />
 
-              <p className="text-sm font-medium mt-3 min-h-[40px]">
+              <p className="text-sm font-medium mt-3 min-h-10">
                 {item.title}
               </p>
 
