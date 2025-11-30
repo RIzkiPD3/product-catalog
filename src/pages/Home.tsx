@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import CategoryFilter from "../components/CategoryFilter";
 import CartBadge from "../components/CartBadge";
+import ThemeToggle from "../components/ThemeToggle";
 import { useCart } from "../context/CartContext";
 
 export default function Home() {
@@ -42,9 +43,7 @@ export default function Home() {
   );
 
   if (loading)
-    return (
-      <p className="text-center text-lg mt-10 font-medium">Loading...</p>
-    );
+    return <p className="text-center text-lg mt-10 font-medium">Loading...</p>;
 
   if (error)
     return (
@@ -55,19 +54,20 @@ export default function Home() {
 
   return (
     <div className="w-[90%] max-w-5xl mx-auto text-center relative">
-      <CartBadge />
+      {/* Header with Cart and Theme Toggle */}
+      <div className="flex justify-between items-center mt-6 bg-white dark:bg-gray-800 py-4 px-6 rounded-lg shadow-md">
+        <ThemeToggle />
+        <CartBadge />
+      </div>
 
-      <h1 className="text-3xl font-bold mt-10">Product Catalog</h1>
+      <h1 className="text-3xl font-bold mt-10 text-gray-900 dark:text-white">Product Catalog</h1>
 
       <SearchBar value={searchTerm} onChange={setSearchTerm} />
 
-      <CategoryFilter
-        value={selectedCategory}
-        onChange={setSelectedCategory}
-      />
+      <CategoryFilter value={selectedCategory} onChange={setSelectedCategory} />
 
       {categoryFiltered.length === 0 ? (
-        <p className="text-lg mt-5 font-medium text-gray-600">
+        <p className="text-lg mt-5 font-medium text-gray-600 dark:text-gray-400">
           Produk tidak ditemukan.
         </p>
       ) : (
@@ -75,7 +75,7 @@ export default function Home() {
           {categoryFiltered.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-xl shadow-md p-4 hover:scale-105 transition cursor-pointer border flex flex-col"
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 hover:scale-105 transition cursor-pointer border border-gray-200 dark:border-gray-700 flex flex-col"
             >
               <img
                 src={item.image}
@@ -83,11 +83,11 @@ export default function Home() {
                 className="w-full h-40 object-contain"
               />
 
-              <p className="text-sm font-medium mt-3 min-h-[40px]">
+              <p className="text-sm font-medium mt-3 min-h-[40px] text-gray-900 dark:text-gray-100">
                 {item.title}
               </p>
 
-              <p className="text-indigo-600 font-bold mt-2 text-lg">
+              <p className="text-indigo-600 dark:text-indigo-400 font-bold mt-2 text-lg">
                 ${item.price}
               </p>
 
