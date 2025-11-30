@@ -1,14 +1,21 @@
-import Home from "./pages/Home";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
+import Login from "./pages/Login";
+import Checkout from "./pages/Checkout";
+import PrivateRoute from "./router/PrivateRoute";
+
 import { CartProvider } from "./context/CartContext";
-import ThemeProvider from "./context/ThemeContext";
+import ThemeProvider, { ThemeContext } from "./context/ThemeContext";
+
 import { useContext, useEffect } from "react";
-import { ThemeContext } from "./context/ThemeContext";
 
 function AppContent() {
   const context = useContext(ThemeContext);
   const theme = context?.theme || "light";
 
-  // Apply theme to body element and html element
+  // Apply theme to HTML & Body
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
@@ -22,8 +29,35 @@ function AppContent() {
   }, [theme]);
 
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "dark bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
-      <Home />
+    <div
+      className={`min-h-screen ${
+        theme === "dark" ? "dark bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+      }`}
+    >
+      <BrowserRouter>
+        <Routes>
+
+          {/* redirect dari "/" */}
+          <Route path="/" element={<Navigate to="/products" replace />} />
+
+          {/* Product List */}
+          <Route path="/products" element={<Products />} />
+
+          {/* Detail Product */}
+          <Route path="/product/:id" element={<ProductDetail />} />
+
+          {/* Cart */}
+          <Route path="/cart" element={<Cart />} />
+
+          {/* Login */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Protected Route */}
+          <Route element={<PrivateRoute />}>
+            <Route path="/checkout" element={<Checkout />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
