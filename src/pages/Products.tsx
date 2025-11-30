@@ -5,7 +5,7 @@ import CartBadge from "../components/CartBadge";
 import ThemeToggle from "../components/ThemeToggle";
 import { useCart } from "../context/CartContext";
 
-export default function Home() {
+export default function Products() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
