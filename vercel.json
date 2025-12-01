@@ -1,8 +1,8 @@
 {
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "^/(?!assets/|@vite/|src/|vite.svg|favicon.ico).*$",
+      "destination": "/index.html"
     }
   ]
 }
