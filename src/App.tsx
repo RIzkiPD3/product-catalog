@@ -1,35 +1,76 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
+import Login from "./pages/Login";
+import Checkout from "./pages/Checkout";
+import PrivateRoute from "./router/PrivateRoute";
+import AuthProvider from "./context/AuthContext";
+import ErrorBoundary from "./components/ErrorBoundary";
+import Navbar from "./components/Navbar";
 
-function App() {
-  const [count, setCount] = useState(0)
+import { CartProvider } from "./context/CartContext";
+import ThemeProvider, { ThemeContext } from "./context/ThemeContext";
+
+import { useContext, useEffect } from "react";
+
+function AppContent() {
+  const context = useContext(ThemeContext);
+  const theme = context?.theme || "light";
+
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+      document.body.style.backgroundColor = "#111827";
+      document.body.style.color = "#ffffff";
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.body.style.backgroundColor = "#f9fafb";
+      document.body.style.color = "#111827";
+    }
+  }, [theme]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div
+      className={`min-h-screen ${
+        theme === "dark"
+          ? "dark bg-gray-900 text-white"
+          : "bg-gray-50 text-gray-900"
+      }`}
+    >
+      <BrowserRouter>
+        {/* ⬇️ ErrorBoundary DIPINDAH KE SINI */}
+        <Navbar />  
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Navigate to="/products" replace />} />
+
+            <Route path="/products" element={<Products />} />
+
+            <Route path="/product/:id" element={<ProductDetail />} />
+
+            <Route path="/cart" element={<Cart />} />
+
+            <Route path="/login" element={<Login />} />
+
+            <Route element={<PrivateRoute />}>
+              <Route path="/checkout" element={<Checkout />} />
+            </Route>
+          </Routes>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <ThemeProvider>
+      <CartProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </CartProvider>
+    </ThemeProvider>
+  );
+}
