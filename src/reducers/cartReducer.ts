@@ -29,8 +29,16 @@ export interface CartItem {
         };
   
       case "REMOVE_ITEM":
+        // Find the index of the first item with matching ID
+        const indexToRemove = state.items.findIndex(item => item.id === action.payload);
+        if (indexToRemove === -1) return state;
+        
+        // Create a new array and remove only that one item
+        const newItems = [...state.items];
+        newItems.splice(indexToRemove, 1);
+        
         return {
-          items: state.items.filter(item => item.id !== action.payload),
+          items: newItems,
           total: state.total - 1,
         };
   
