@@ -36,12 +36,10 @@ export default function ProductDetail() {
       </div>
     );
 
-  if (error)
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        {error}
-      </div>
-    );
+  // Lempar error saat render agar ErrorBoundary bisa menangkap
+  if (error) {
+    throw new Error(error);
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 dark:text-white">
