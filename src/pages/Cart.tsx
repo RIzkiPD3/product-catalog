@@ -3,12 +3,12 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
-  const { state, removeFromCart } = useCart();
+  const { state, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
 
-  // Hitung total harga pakai useMemo
+  // Hitung total harga pakai useMemo (price * quantity)
   const total = useMemo(() => {
-    return state.items.reduce((sum, item) => sum + item.price, 0);
+    return state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   }, [state.items]);
 
   // Handler hapus item
@@ -35,7 +35,15 @@ export default function Cart() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-gray-900 dark:text-gray-100">
-      <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">Your Cart</h1>
+        <button
+          onClick={() => clearCart()}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+        >
+          Remove All
+        </button>
+      </div>
 
       <div className="space-y-4">
         {state.items.map((item) => (
@@ -50,9 +58,11 @@ export default function Cart() {
                 className="w-16 h-16 object-contain rounded"
               />
               <div>
-                <p className="font-medium">{item.title}</p>
+                <p className="font-medium">
+                  {item.title} {item.quantity > 1 && <span className="text-indigo-600 dark:text-indigo-400">x{item.quantity}</span>}
+                </p>
                 <p className="text-indigo-600 dark:text-indigo-400 font-bold">
-                  ${item.price}
+                  ${item.price} {item.quantity > 1 && <span className="text-sm text-gray-500 dark:text-gray-400">(${(item.price * item.quantity).toFixed(2)} total)</span>}
                 </p>
               </div>
             </div>

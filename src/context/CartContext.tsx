@@ -4,7 +4,7 @@ import type { CartState, CartItem } from "../reducers/cartReducer"
 
 interface CartContextType {
   state: CartState;
-  addToCart: (item: CartItem) => void;
+  addToCart: (item: Omit<CartItem, "quantity">) => void;
   removeFromCart: (id: number) => void;
   clearCart: () => void;
 }
@@ -14,7 +14,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, cartInitialState);
 
-  const addToCart = (item: CartItem) =>
+  const addToCart = (item: Omit<CartItem, "quantity">) =>
     dispatch({ type: "ADD_ITEM", payload: item });
 
   const removeFromCart = (id: number) =>
