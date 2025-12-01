@@ -6,9 +6,9 @@ export default function Cart() {
   const { state, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
 
-  // Hitung total harga pakai useMemo
+  // Hitung total harga pakai useMemo (price * quantity)
   const total = useMemo(() => {
-    return state.items.reduce((sum, item) => sum + item.price, 0);
+    return state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   }, [state.items]);
 
   // Handler hapus item
@@ -58,9 +58,11 @@ export default function Cart() {
                 className="w-16 h-16 object-contain rounded"
               />
               <div>
-                <p className="font-medium">{item.title}</p>
+                <p className="font-medium">
+                  {item.title} {item.quantity > 1 && <span className="text-indigo-600 dark:text-indigo-400">x{item.quantity}</span>}
+                </p>
                 <p className="text-indigo-600 dark:text-indigo-400 font-bold">
-                  ${item.price}
+                  ${item.price} {item.quantity > 1 && <span className="text-sm text-gray-500 dark:text-gray-400">(${(item.price * item.quantity).toFixed(2)} total)</span>}
                 </p>
               </div>
             </div>
