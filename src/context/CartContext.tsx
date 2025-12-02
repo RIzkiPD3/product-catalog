@@ -5,7 +5,10 @@ import type { CartState, CartItem } from "../reducers/cartReducer"
 interface CartContextType {
   state: CartState;
   addToCart: (item: Omit<CartItem, "quantity">) => void;
-  removeFromCart: (id: number) => void;
+  deleteFromCart: (id: number) => void;
+  increaseQuantity: (id: number) => void;
+  decreaseQuantity: (id: number) => void;
+  setQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
 }
 
@@ -17,13 +20,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addToCart = (item: Omit<CartItem, "quantity">) =>
     dispatch({ type: "ADD_ITEM", payload: item });
 
-  const removeFromCart = (id: number) =>
-    dispatch({ type: "REMOVE_ITEM", payload: id });
+  const deleteFromCart = (id: number) =>
+    dispatch({ type: "DELETE_ITEM", payload: id });
+
+  const increaseQuantity = (id: number) =>
+    dispatch({ type: "INCREASE_QUANTITY", payload: id });
+
+  const decreaseQuantity = (id: number) =>
+    dispatch({ type: "DECREASE_QUANTITY", payload: id });
+
+  const setQuantity = (id: number, quantity: number) =>
+    dispatch({ type: "SET_QUANTITY", payload: { id, quantity } });
 
   const clearCart = () => dispatch({ type: "CLEAR_CART" });
 
   return (
-    <CartContext.Provider value={{ state, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ state, addToCart, deleteFromCart, increaseQuantity, decreaseQuantity, setQuantity, clearCart }}>
       {children}
     </CartContext.Provider>
   );
