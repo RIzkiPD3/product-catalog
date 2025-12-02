@@ -1,10 +1,16 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function Cart() {
-  const { state, removeFromCart, clearCart } = useCart();
+  const { state, deleteFromCart, increaseQuantity, decreaseQuantity, setQuantity, clearCart } = useCart();
   const navigate = useNavigate();
+
+  // Modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
 
   // Hitung total harga pakai useMemo (price * quantity)
   const total = useMemo(() => {
@@ -12,12 +18,30 @@ export default function Cart() {
   }, [state.items]);
 
   // Handler hapus item
-  const handleRemove = useCallback(
-    (id: number) => {
-      removeFromCart(id);
-    },
-    [removeFromCart]
-  );
+  const handleDeleteClick = useCallback((id: number) => {
+    setSelectedItemId(id);
+    setShowDeleteModal(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (selectedItemId !== null) {
+      deleteFromCart(selectedItemId);
+      setSelectedItemId(null);
+    }
+  }, [selectedItemId, deleteFromCart]);
+
+  // Handler clear cart
+  const handleClearClick = useCallback(() => {
+    setShowClearModal(true);
+  }, []);
+
+  // Handler quantity change
+  const handleQuantityChange = useCallback((id: number, value: string) => {
+    const numValue = parseInt(value);
+    if (!isNaN(numValue) && numValue >= 1) {
+      setQuantity(id, numValue);
+    }
+  }, [setQuantity]);
 
   if (state.items.length === 0) {
     return (
@@ -38,7 +62,7 @@ export default function Cart() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Your Cart</h1>
         <button
-          onClick={() => clearCart()}
+          onClick={handleClearClick}
           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
         >
           Remove All
@@ -58,21 +82,45 @@ export default function Cart() {
                 className="w-16 h-16 object-contain rounded"
               />
               <div>
-                <p className="font-medium">
-                  {item.title} {item.quantity > 1 && <span className="text-indigo-600 dark:text-indigo-400">x{item.quantity}</span>}
-                </p>
+                <p className="font-medium">{item.title}</p>
                 <p className="text-indigo-600 dark:text-indigo-400 font-bold">
                   ${item.price} {item.quantity > 1 && <span className="text-sm text-gray-500 dark:text-gray-400">(${(item.price * item.quantity).toFixed(2)} total)</span>}
                 </p>
               </div>
             </div>
 
-            <button
-              onClick={() => handleRemove(item.id)}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-            >
-              Remove
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Quantity Controls */}
+              <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                <button
+                  onClick={() => decreaseQuantity(item.id)}
+                  className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition font-bold"
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  value={item.quantity}
+                  onChange={(e) => handleQuantityChange(item.id, e.target.value)}
+                  className="w-16 text-center bg-transparent text-gray-900 dark:text-gray-100 font-semibold outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <button
+                  onClick={() => increaseQuantity(item.id)}
+                  className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition font-bold"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Delete Button */}
+              <button
+                onClick={() => handleDeleteClick(item.id)}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              >
+                Remove
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -90,6 +138,23 @@ export default function Cart() {
       >
         Checkout
       </button>
+
+      {/* Confirmation Modals */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        title="Hapus Item?"
+        message="Apakah Anda yakin ingin menghapus item ini dari keranjang?"
+      />
+
+      <ConfirmModal
+        isOpen={showClearModal}
+        onClose={() => setShowClearModal(false)}
+        onConfirm={clearCart}
+        title="Hapus Semua Item?"
+        message="Apakah Anda yakin ingin menghapus semua item dari keranjang?"
+      />
     </div>
   );
 }
