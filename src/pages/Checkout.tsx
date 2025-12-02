@@ -1,10 +1,12 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import InfoModal from "../components/InfoModal";
 
 export default function Checkout() {
-  const { state } = useCart();
+  const { state, clearCart } = useCart();
   const navigate = useNavigate();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Hitung total harga
   const total = useMemo(() => {
@@ -27,7 +29,11 @@ export default function Checkout() {
   }
 
   const handleConfirm = () => {
-    alert("Order berhasil dibuat! (Simulasi)");
+    setShowSuccessModal(true);
+  };
+
+  const handleSuccessClose = () => {
+    clearCart();
     navigate("/products");
   };
 
@@ -74,6 +80,14 @@ export default function Checkout() {
       >
         Confirm Order
       </button>
+
+      <InfoModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessClose}
+        title="Pesanan Dibuat"
+        message="Pesanan Anda telah berhasil dibuat!"
+        buttonText="OK"
+      />
     </div>
   );
 }
