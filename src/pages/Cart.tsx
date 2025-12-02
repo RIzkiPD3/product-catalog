@@ -1,15 +1,19 @@
 import { useMemo, useCallback, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import ConfirmModal from "../components/ConfirmModal";
+import InfoModal from "../components/InfoModal";
 
 export default function Cart() {
   const { state, deleteFromCart, increaseQuantity, decreaseQuantity, setQuantity, clearCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
 
   // Hitung total harga pakai useMemo (price * quantity)
@@ -42,6 +46,15 @@ export default function Cart() {
       setQuantity(id, numValue);
     }
   }, [setQuantity]);
+
+  // Handler checkout
+  const handleCheckout = useCallback(() => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+    } else {
+      navigate("/checkout");
+    }
+  }, [isAuthenticated, navigate]);
 
   if (state.items.length === 0) {
     return (
@@ -133,7 +146,7 @@ export default function Cart() {
       </div>
 
       <button
-        onClick={() => navigate("/checkout")}
+        onClick={handleCheckout}
         className="mt-6 w-full py-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition text-lg font-semibold"
       >
         Checkout
@@ -154,6 +167,15 @@ export default function Cart() {
         onConfirm={clearCart}
         title="Hapus Semua Item?"
         message="Apakah Anda yakin ingin menghapus semua item dari keranjang?"
+      />
+
+      <InfoModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        title="Kamu Belum Login"
+        message="Silahkan login terlebih dahulu untuk melanjutkan checkout."
+        buttonText="Login"
+        onButtonClick={() => navigate("/login")}
       />
     </div>
   );
