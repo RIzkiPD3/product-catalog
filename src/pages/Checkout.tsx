@@ -20,11 +20,11 @@ export default function Checkout() {
   // If no selected items
   if (selectedItems.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-gray-800 dark:text-gray-200">
-        <h2 className="text-2xl font-bold mb-4">Tidak ada produk yang dipilih 😢</h2>
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 text-gray-800 dark:text-gray-200">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">Tidak ada produk yang dipilih 😢</h2>
         <button
           onClick={() => navigate("/cart")}
-          className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition"
+          className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition text-sm sm:text-base"
         >
           Kembali ke Cart
         </button>
@@ -42,45 +42,48 @@ export default function Checkout() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 text-gray-900 dark:text-gray-100">
-      <h1 className="text-3xl font-bold mb-6">Checkout</h1>
+    <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 text-gray-900 dark:text-gray-100">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Checkout</h1>
 
       {/* List Item */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {selectedItems.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700"
+            className="flex items-start gap-3 sm:gap-4 bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700"
           >
-            <div className="flex items-center gap-4">
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-16 h-16 object-contain rounded"
-              />
-              <div>
-                <p className="font-medium">{item.title}</p>
-                <p className="text-indigo-600 dark:text-indigo-400 font-bold">
-                  ${item.price} x {item.quantity} = ${(item.price * item.quantity).toFixed(2)}
-                </p>
-              </div>
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded flex-shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm sm:text-base line-clamp-2">{item.title}</p>
+              <p className="text-indigo-600 dark:text-indigo-400 font-bold text-sm sm:text-base mt-1">
+                ${item.price} x {item.quantity}
+              </p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                Subtotal: ${(item.price * item.quantity).toFixed(2)}
+              </p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Total */}
-      <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-between">
-        <p className="text-xl font-semibold">Total Pembayaran:</p>
-        <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-          ${total.toFixed(2)}
-        </p>
+      <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-gray-100 dark:bg-gray-700 rounded-xl">
+        <div className="flex items-center justify-between">
+          <p className="text-base sm:text-xl font-semibold">Total Pembayaran:</p>
+          <p className="text-xl sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+            ${total.toFixed(2)}
+          </p>
+        </div>
       </div>
 
       {/* Confirm Button */}
       <button
         onClick={handleConfirm}
-        className="mt-6 w-full py-3 bg-green-600 dark:bg-green-500 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition text-lg font-semibold"
+        className="mt-4 sm:mt-6 w-full py-3 sm:py-3.5 bg-green-600 dark:bg-green-500 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition text-base sm:text-lg font-semibold"
       >
         Confirm Order
       </button>
