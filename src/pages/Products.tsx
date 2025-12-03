@@ -110,7 +110,7 @@ export default function Products() {
                     image: item.image,
                   })
                 }
-                className="mt-4 bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition text-sm font-medium"
+                className="mt-auto bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition text-sm font-medium"
               >
                 Add to Cart
               </button>
