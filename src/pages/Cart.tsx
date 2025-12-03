@@ -6,7 +6,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import InfoModal from "../components/InfoModal";
 
 export default function Cart() {
-  const { state, deleteFromCart, increaseQuantity, decreaseQuantity, setQuantity, clearCart } = useCart();
+  const { state, deleteFromCart, increaseQuantity, decreaseQuantity, setQuantity, clearCart, toggleSelection, selectAll, deselectAll } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -16,10 +16,16 @@ export default function Cart() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
 
-  // Hitung total harga pakai useMemo (price * quantity)
+
+  // Calculate selected items
+  const selectedItems = useMemo(() => state.items.filter(item => item.selected), [state.items]);
+  const allSelected = useMemo(() => state.items.length > 0 && state.items.every(item => item.selected), [state.items]);
+  const hasSelectedItems = selectedItems.length > 0;
+
+  // Calculate total for selected items only
   const total = useMemo(() => {
-    return state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  }, [state.items]);
+    return selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }, [selectedItems]);
 
   // Handler hapus item
   const handleDeleteClick = useCallback((id: number) => {
@@ -47,14 +53,28 @@ export default function Cart() {
     }
   }, [setQuantity]);
 
+
+  // Handler select all toggle
+  const handleSelectAllToggle = useCallback(() => {
+    if (allSelected) {
+      deselectAll();
+    } else {
+      selectAll();
+    }
+  }, [allSelected, selectAll, deselectAll]);
+
   // Handler checkout
   const handleCheckout = useCallback(() => {
+    if (!hasSelectedItems) {
+      alert("Pilih minimal satu produk untuk checkout");
+      return;
+    }
     if (!isAuthenticated) {
       setShowLoginModal(true);
     } else {
       navigate("/checkout");
     }
-  }, [isAuthenticated, navigate]);
+  }, [hasSelectedItems, isAuthenticated, navigate]);
 
   if (state.items.length === 0) {
     return (
@@ -73,7 +93,18 @@ export default function Cart() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-gray-900 dark:text-gray-100">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Your Cart</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold">Your Cart</h1>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={handleSelectAllToggle}
+              className="w-5 h-5 cursor-pointer accent-indigo-600"
+            />
+            <span className="text-sm font-medium">Select All</span>
+          </label>
+        </div>
         <button
           onClick={handleClearClick}
           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
@@ -86,9 +117,21 @@ export default function Cart() {
         {state.items.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700"
+            className={`flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl shadow border transition-all ${
+              item.selected 
+                ? 'border-indigo-500 dark:border-indigo-400' 
+                : 'border-gray-200 dark:border-gray-700 opacity-60'
+            }`}
           >
             <div className="flex items-center gap-4">
+              {/* Checkbox */}
+              <input
+                type="checkbox"
+                checked={item.selected}
+                onChange={() => toggleSelection(item.id)}
+                className="w-5 h-5 cursor-pointer accent-indigo-600"
+              />
+              
               <img
                 src={item.image}
                 alt={item.title}
@@ -138,8 +181,11 @@ export default function Cart() {
         ))}
       </div>
 
+
       <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-between">
-        <p className="text-xl font-semibold">Total:</p>
+        <div>
+          <p className="text-xl font-semibold">Total ({selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected):</p>
+        </div>
         <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
           ${total.toFixed(2)}
         </p>
@@ -147,7 +193,12 @@ export default function Cart() {
 
       <button
         onClick={handleCheckout}
-        className="mt-6 w-full py-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition text-lg font-semibold"
+        disabled={!hasSelectedItems}
+        className={`mt-6 w-full py-3 rounded-lg transition text-lg font-semibold ${
+          hasSelectedItems
+            ? 'bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600'
+            : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+        }`}
       >
         Checkout
       </button>

@@ -4,25 +4,29 @@ import { useNavigate } from "react-router-dom";
 import InfoModal from "../components/InfoModal";
 
 export default function Checkout() {
-  const { state, clearCart } = useCart();
+  const { state, deleteSelectedItems } = useCart();
   const navigate = useNavigate();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Hitung total harga
-  const total = useMemo(() => {
-    return state.items.reduce((sum, item) => sum + item.price, 0);
-  }, [state.items]);
+  // Filter only selected items
+  const selectedItems = state.items.filter(item => item.selected);
 
-  // Jika cart kosong
-  if (state.items.length === 0) {
+  // Calculate total for selected items (price * quantity)
+  const total = useMemo(() => {
+    return selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }, [selectedItems]);
+
+
+  // If no selected items
+  if (selectedItems.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-gray-800 dark:text-gray-200">
-        <h2 className="text-2xl font-bold mb-4">Keranjang masih kosong 😢</h2>
+        <h2 className="text-2xl font-bold mb-4">Tidak ada produk yang dipilih 😢</h2>
         <button
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/cart")}
           className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition"
         >
-          Kembali ke Produk
+          Kembali ke Cart
         </button>
       </div>
     );
@@ -33,7 +37,7 @@ export default function Checkout() {
   };
 
   const handleSuccessClose = () => {
-    clearCart();
+    deleteSelectedItems();
     navigate("/products");
   };
 
@@ -43,7 +47,7 @@ export default function Checkout() {
 
       {/* List Item */}
       <div className="space-y-4">
-        {state.items.map((item) => (
+        {selectedItems.map((item) => (
           <div
             key={item.id}
             className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700"
@@ -57,7 +61,7 @@ export default function Checkout() {
               <div>
                 <p className="font-medium">{item.title}</p>
                 <p className="text-indigo-600 dark:text-indigo-400 font-bold">
-                  ${item.price}
+                  ${item.price} x {item.quantity} = ${(item.price * item.quantity).toFixed(2)}
                 </p>
               </div>
             </div>

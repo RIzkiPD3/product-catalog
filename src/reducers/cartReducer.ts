@@ -4,6 +4,7 @@ export interface CartItem {
     price: number;
     image: string;
     quantity: number;
+    selected: boolean;
   }
   
   export interface CartState {
@@ -12,11 +13,15 @@ export interface CartItem {
   }
   
   export type CartAction =
-    | { type: "ADD_ITEM"; payload: Omit<CartItem, "quantity"> }
+    | { type: "ADD_ITEM"; payload: Omit<CartItem, "quantity" | "selected"> }
     | { type: "DELETE_ITEM"; payload: number }
     | { type: "INCREASE_QUANTITY"; payload: number }
     | { type: "DECREASE_QUANTITY"; payload: number }
     | { type: "SET_QUANTITY"; payload: { id: number; quantity: number } }
+    | { type: "TOGGLE_SELECTION"; payload: number }
+    | { type: "SELECT_ALL" }
+    | { type: "DESELECT_ALL" }
+    | { type: "DELETE_SELECTED_ITEMS" }
     | { type: "CLEAR_CART" };
   
   export const cartInitialState: CartState = {
@@ -45,9 +50,9 @@ export interface CartItem {
             total: state.total + 1,
           };
         } else {
-          // Item doesn't exist, add new item with quantity 1
+          // Item doesn't exist, add new item with quantity 1 and selected by default
           return {
-            items: [...state.items, { ...action.payload, quantity: 1 }],
+            items: [...state.items, { ...action.payload, quantity: 1, selected: true }],
             total: state.total + 1,
           };
         }
@@ -127,6 +132,44 @@ export interface CartItem {
           total: state.total + quantityDiff,
         };
   
+      case "TOGGLE_SELECTION":
+        const toggleIndex = state.items.findIndex(item => item.id === action.payload);
+        if (toggleIndex === -1) return state;
+        
+        const toggledItems = [...state.items];
+        toggledItems[toggleIndex] = {
+          ...toggledItems[toggleIndex],
+          selected: !toggledItems[toggleIndex].selected,
+        };
+        
+        return {
+          ...state,
+          items: toggledItems,
+        };
+  
+      case "SELECT_ALL":
+        return {
+          ...state,
+          items: state.items.map(item => ({ ...item, selected: true })),
+        };
+  
+      case "DESELECT_ALL":
+        return {
+          ...state,
+          items: state.items.map(item => ({ ...item, selected: false })),
+        };
+  
+      case "DELETE_SELECTED_ITEMS":
+        const remainingItems = state.items.filter(item => !item.selected);
+        const deletedCount = state.items
+          .filter(item => item.selected)
+          .reduce((sum, item) => sum + item.quantity, 0);
+        
+        return {
+          items: remainingItems,
+          total: state.total - deletedCount,
+        };
+
       case "CLEAR_CART":
         return cartInitialState;
   
@@ -134,4 +177,3 @@ export interface CartItem {
         return state;
     }
   }
-  

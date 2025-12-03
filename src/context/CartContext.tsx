@@ -4,11 +4,15 @@ import type { CartState, CartItem } from "../reducers/cartReducer"
 
 interface CartContextType {
   state: CartState;
-  addToCart: (item: Omit<CartItem, "quantity">) => void;
+  addToCart: (item: Omit<CartItem, "quantity" | "selected">) => void;
   deleteFromCart: (id: number) => void;
   increaseQuantity: (id: number) => void;
   decreaseQuantity: (id: number) => void;
   setQuantity: (id: number, quantity: number) => void;
+  toggleSelection: (id: number) => void;
+  selectAll: () => void;
+  deselectAll: () => void;
+  deleteSelectedItems: () => void;
   clearCart: () => void;
 }
 
@@ -17,7 +21,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, cartInitialState);
 
-  const addToCart = (item: Omit<CartItem, "quantity">) =>
+  const addToCart = (item: Omit<CartItem, "quantity" | "selected">) =>
     dispatch({ type: "ADD_ITEM", payload: item });
 
   const deleteFromCart = (id: number) =>
@@ -32,10 +36,31 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const setQuantity = (id: number, quantity: number) =>
     dispatch({ type: "SET_QUANTITY", payload: { id, quantity } });
 
+  const toggleSelection = (id: number) =>
+    dispatch({ type: "TOGGLE_SELECTION", payload: id });
+
+  const selectAll = () => dispatch({ type: "SELECT_ALL" });
+
+  const deselectAll = () => dispatch({ type: "DESELECT_ALL" });
+
+  const deleteSelectedItems = () => dispatch({ type: "DELETE_SELECTED_ITEMS" });
+
   const clearCart = () => dispatch({ type: "CLEAR_CART" });
 
   return (
-    <CartContext.Provider value={{ state, addToCart, deleteFromCart, increaseQuantity, decreaseQuantity, setQuantity, clearCart }}>
+    <CartContext.Provider value={{ 
+      state, 
+      addToCart, 
+      deleteFromCart, 
+      increaseQuantity, 
+      decreaseQuantity, 
+      setQuantity, 
+      toggleSelection,
+      selectAll,
+      deselectAll,
+      deleteSelectedItems,
+      clearCart 
+    }}>
       {children}
     </CartContext.Provider>
   );
