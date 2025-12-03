@@ -27,33 +27,36 @@ export default function Navbar() {
     <nav className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Logo/Brand */}
-        <Link 
-          to="/products" 
-          className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent hover:scale-105 transition-transform flex-shrink-0"
-          onClick={closeMobileMenu}
-        >
-          🛍️ Shop
-        </Link>
+        {/* Left Side: Logo + Navigation */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Logo/Brand */}
+          <Link 
+            to="/products" 
+            className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent hover:scale-105 transition-transform flex-shrink-0"
+            onClick={closeMobileMenu}
+          >
+            🛍️ Shop
+          </Link>
 
-        {/* Desktop Navigation - Hidden on mobile */}
-        <div className="hidden md:flex items-center gap-2">
-          <Link to="/products" className={getLinkClasses("/products")}>
-            <span className="flex items-center gap-2">
-              📦 Products
-            </span>
-          </Link>
-          
-          <Link to="/cart" className={getLinkClasses("/cart")}>
-            <span className="flex items-center gap-2">
-              🛒 Cart
-              {state.items.length > 0 && (
-                <span className="ml-1 px-2 py-0.5 text-xs font-bold rounded-full bg-red-500 text-white animate-pulse">
-                  {state.items.length}
-                </span>
-              )}
-            </span>
-          </Link>
+          {/* Desktop Navigation - Hidden on mobile */}
+          <div className="hidden md:flex items-center gap-2">
+            <Link to="/products" className={getLinkClasses("/products")}>
+              <span className="flex items-center gap-2">
+                📦 Products
+              </span>
+            </Link>
+            
+            <Link to="/cart" className={getLinkClasses("/cart")}>
+              <span className="flex items-center gap-2">
+                🛒 Cart
+                {state.items.length > 0 && (
+                  <span className="ml-1 px-2 py-0.5 text-xs font-bold rounded-full bg-red-500 text-white animate-pulse">
+                    {state.items.length}
+                  </span>
+                )}
+              </span>
+            </Link>
+          </div>
         </div>
 
         {/* Desktop Auth & Theme - Hidden on mobile */}
