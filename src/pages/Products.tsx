@@ -3,15 +3,17 @@ import { Link } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import CategoryFilter from "../components/CategoryFilter";
 import { useCart } from "../context/CartContext";
+import { useProducts } from "../context/ProductContext";
 
 export default function Products() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [apiProducts, setApiProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   const { addToCart } = useCart();
+  const { products: crudProducts } = useProducts();
 
   useEffect(() => {
     const getProducts = async () => {
@@ -20,7 +22,7 @@ export default function Products() {
         if (!res.ok) throw new Error("Gagal memuat data");
 
         const data = await res.json();
-        setProducts(data);
+        setApiProducts(data);
       } catch (err: any) {
         setError(err.message || "Terjadi kesalahan");
       } finally {
@@ -31,11 +33,14 @@ export default function Products() {
     getProducts();
   }, []);
 
-  const filteredProducts = products.filter((item) =>
+  // Combine CRUD products (first) with API products (second)
+  const allProducts = [...crudProducts, ...apiProducts];
+
+  const filteredProducts = allProducts.filter((item: any) =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const categoryFiltered = filteredProducts.filter((item) =>
+  const categoryFiltered = filteredProducts.filter((item: any) =>
     selectedCategory === "all"
       ? true
       : item.category.toLowerCase() === selectedCategory.toLowerCase()

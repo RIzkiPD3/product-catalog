@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useProducts } from "../context/ProductContext";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { products: crudProducts } = useProducts();
 
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -14,6 +16,16 @@ export default function ProductDetail() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        // First, check if product exists in CRUD products
+        const crudProduct = crudProducts.find(p => p.id === Number(id));
+        
+        if (crudProduct) {
+          setProduct(crudProduct);
+          setLoading(false);
+          return;
+        }
+
+        // If not found in CRUD, fetch from API
         const res = await fetch(`https://fakestoreapi.com/products/${id}`);
         if (!res.ok) throw new Error("Gagal memuat produk");
 
@@ -27,7 +39,7 @@ export default function ProductDetail() {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, crudProducts]);
 
   if (loading)
     return (

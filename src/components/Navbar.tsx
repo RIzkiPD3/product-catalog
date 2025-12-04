@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Navbar() {
   const { state } = useCart();
   const { pathname } = useLocation();
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const getLinkClasses = (path: string) => {
@@ -45,6 +45,14 @@ export default function Navbar() {
                 📦 Products
               </span>
             </Link>
+            
+            {isAdmin && (
+              <Link to="/dashboard" className={getLinkClasses("/dashboard")}>
+                <span className="flex items-center gap-2">
+                  📊 Dashboard
+                </span>
+              </Link>
+            )}
             
             <Link to="/cart" className={getLinkClasses("/cart")}>
               <span className="flex items-center gap-2">
@@ -119,6 +127,18 @@ export default function Navbar() {
               📦 Products
             </span>
           </Link>
+          
+          {isAdmin && (
+            <Link 
+              to="/dashboard" 
+              className={`${getLinkClasses("/dashboard")} block text-center`}
+              onClick={closeMobileMenu}
+            >
+              <span className="flex items-center justify-center gap-2">
+                📊 Dashboard
+              </span>
+            </Link>
+          )}
           
           <Link 
             to="/cart" 
