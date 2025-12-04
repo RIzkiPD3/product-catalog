@@ -5,12 +5,15 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Checkout from "./pages/Checkout";
+import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./router/PrivateRoute";
+import AdminRoute from "./router/AdminRoute";
 import AuthProvider from "./context/AuthContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Navbar from "./components/Navbar";
 
 import { CartProvider } from "./context/CartContext";
+import { ProductProvider } from "./context/ProductContext";
 import ThemeProvider, { ThemeContext } from "./context/ThemeContext";
 
 import { useContext, useEffect } from "react";
@@ -59,6 +62,10 @@ function AppContent() {
             <Route element={<PrivateRoute />}>
               <Route path="/checkout" element={<Checkout />} />
             </Route>
+
+            <Route element={<AdminRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Route>
           </Routes>
         </ErrorBoundary>
       </BrowserRouter>
@@ -69,11 +76,13 @@ function AppContent() {
 export default function App() {
   return (
     <ThemeProvider>
-      <CartProvider>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </CartProvider>
+      <ProductProvider>
+        <CartProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </CartProvider>
+      </ProductProvider>
     </ThemeProvider>
   );
 }
